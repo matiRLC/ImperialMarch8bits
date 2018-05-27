@@ -1,0 +1,2554 @@
+
+AVRASM ver. 1.74  imperial_march_song_full.asm Thu Sep 22 21:02:49 2011
+
+
+         ; *****************************************************************************
+         ; Proyect: Imperial March Song (FULL)
+         ; Author:  Matias Quintana Rosales
+         ; Purpose: Shally
+         ; Date: inicio - 19/8/2011
+         ;       fin    - 19/9/2011
+         ;       fecha de entrega - 20/10/11
+         ; *****************************************************************************
+         
+          .include "C:\VMLAB\include\m8def.inc"
+         ;***************************************************************************
+         ;* A P P L I C A T I O N   N O T E   F O R   T H E   A V R   F A M I L Y
+         ;* 
+         ;* Number				:AVR000
+         ;* File Name			:"m8def.inc"
+         ;* Title				:Register/Bit Definitions for the ATmega8
+         ;* Date                 :07.09.2001
+         ;* Version              :1.00
+         ;* Support telephone	:+47 72 88 43 88 (ATMEL Norway)
+         ;* Support fax			:+47 72 88 43 99 (ATMEL Norway)
+         ;* Support E-mail		:avr@atmel.no
+         ;* Target MCU			:ATmega8
+         ;*
+         ;* DESCRIPTION
+         ;* When including this file in the assembly program file, all I/O register	
+         ;* names and I/O register bit names appearing in the data book can be used.
+         ;* In addition, the six registers forming the three data pointers X, Y and
+         ;* Z have been assigned names XL - ZH. Highest RAM address for Internal 
+         ;* SRAM is also defined 
+         ;*
+         ;* The Register names are represented by their hexadecimal address.
+         ;* 
+         ;* The Register Bit names are represented by their bit number (0-7).
+         ;* 
+         ;* Please observe the difference in using the bit names with instructions
+         ;* such as "sbr"/"cbr" (set/clear bit in register) and "sbrs"/"sbrc" 
+         ;* (skip if bit in register set/cleared). The following example illustrates
+         ;* this:
+         ;* 
+         ;* in	r16,PORTB				;read PORTB latch
+         ;* sbr	r16,(1<<PB6)+(1<<PB5)	;set PB6 and PB5 (use masks, not bit#)
+         ;* out  PORTB,r16				;output to PORTB
+         ;*
+         ;* in	r16,TIFR				;read the Timer Interrupt Flag Register
+         ;* sbrc	r16,TOV0				;test the overflow flag (use bit#)
+         ;* rjmp	TOV0_is_set				;jump if set
+         ;* ...							;otherwise do something else
+         ;***************************************************************************
+         
+         ;***** Specify Device
+          .device ATmega8
+         
+         ;***** I/O Register Definitions
+          .equ	SREG	=$3f
+          .equ	SPH		=$3e
+          .equ	SPL		=$3d
+          .equ	GIMSK	=$3b
+          .equ	GICR	=$3b		; new name for GIMSK
+          .equ	GIFR	=$3a
+          .equ	TIMSK	=$39
+          .equ	TIFR	=$38
+          .equ	SPMCR	=$37
+          .equ    I2CR    =$36
+          .equ    TWCR    =$36
+          .equ    MCUCR   =$35
+          .equ    MCUSR   =$34		; For compatibility, 
+          .equ    MCUCSR  =$34		; keep both names until further
+          .equ	TCCR0	=$33
+          .equ	TCNT0	=$32
+          .equ    OSCCAL  =$31
+          .equ    SFIOR   =$30
+          .equ	TCCR1A	=$2f
+          .equ	TCCR1B	=$2e
+          .equ	TCNT1H	=$2d
+          .equ	TCNT1L	=$2c
+          .equ	OCR1AH	=$2b
+          .equ	OCR1AL	=$2a
+          .equ	OCR1BH	=$29
+          .equ	OCR1BL	=$28
+          .equ	ICR1H	=$27
+          .equ	ICR1L	=$26
+          .equ	TCCR2	=$25
+          .equ	TCNT2	=$24
+          .equ	OCR2	=$23
+          .equ	ASSR	=$22
+          .equ	WDTCR	=$21
+          .equ    UBRRH   =$20		;  Note! UCSRC equals UBRRH
+          .equ	EEARH	=$1f
+          .equ	EEARL	=$1e
+          .equ	EEDR	=$1d
+          .equ	EECR	=$1c
+          .equ	PORTB	=$18
+          .equ	DDRB	=$17
+          .equ	PINB	=$16
+          .equ	PORTC	=$15
+          .equ	DDRC	=$14
+          .equ	PINC	=$13
+          .equ	PORTD	=$12
+          .equ	DDRD	=$11
+          .equ	PIND	=$10
+          .equ	SPDR	=$0f
+          .equ	SPSR	=$0e
+          .equ	SPCR	=$0d
+          .equ	UDR	=$0c
+          .equ	UCSRA	=$0b
+          .equ	UCSRB	=$0a
+          .equ	UCSRC	=$20		;  Note! UCSRC equals UBRRH
+          .equ	UBRRL	=$09
+          .equ	ACSR	=$08
+          .equ    ADMUX   =$07
+          .equ    ADCSR   =$06
+          .equ    ADCH    =$05
+          .equ    ADCL    =$04
+          .equ    I2DR    =$03
+          .equ    I2AR    =$02
+          .equ    I2SR    =$01
+          .equ    I2BR    =$00
+          .equ    TWDR    =$03
+          .equ    TWAR    =$02
+          .equ    TWSR    =$01
+          .equ    TWBR    =$00
+         
+         
+         
+         ;***** Bit Definitions
+         ;GICR  (former GIMSK)
+          .equ	INT1	=7
+          .equ	INT0	=6
+          .equ	IVSEL	=1		; interrupt vector select
+          .equ	IVCE	=0		; interrupt vector change enable
+         
+         ;GIFR
+          .equ	INTF1	=7
+          .equ	INTF0	=6
+         
+         ;TIMSK
+          .equ    TOIE0   =0
+          .equ    TOIE1   =2
+          .equ    OCIE1B  =3
+          .equ    OCIE1A  =4
+          .equ    TICIE1  =5
+          .equ    TOIE2   =6
+          .equ    OCIE2   =7
+         
+         ;TIFR
+          .equ    TOV0    =0
+          .equ    TOV1    =2
+          .equ    OCF1B   =3
+          .equ    OCF1A   =4
+          .equ    ICF1    =5
+          .equ    TOV2    =6
+          .equ    OCF2    =7
+         
+         ;SPMCR
+          .equ	SPMIE	=7
+          .equ	RWWSB	=6
+          .equ	RWWSRE	=4
+          .equ	BLBSET	=3
+          .equ	PGWRT	=2
+          .equ	PGERS	=1
+          .equ	SPMEN	=0
+         
+         ;MCUCR
+          .equ    SE      =7
+          .equ    SM2     =6
+          .equ    SM1     =5
+          .equ    SM0     =4
+          .equ    ISC11   =3
+          .equ    ISC10   =2
+          .equ    ISC01   =1
+          .equ    ISC00   =0
+         
+         ;MCUCSR
+          .equ    WDRF    =3
+          .equ    BORF    =2
+          .equ    EXTRF   =1
+          .equ    PORF    =0
+         
+         ;TCCR0
+          .equ	CS02	=2
+          .equ	CS01	=1
+          .equ	CS00	=0
+         
+         ;TCCR1A
+          .equ	COM1A1	=7
+          .equ	COM1A0	=6
+          .equ	COM1B1	=5
+          .equ	COM1B0	=4
+          .equ	FOC1A	=3
+          .equ	FOC1B	=2
+          .equ	PWM11	=1	; OBSOLETE! Use WGM11
+          .equ	PWM10	=0	; OBSOLETE! Use WGM10
+          .equ	WGM11	=1
+          .equ	WGM10	=0
+         ;TCCR1B
+          .equ	ICNC1	=7
+          .equ	ICES1	=6
+          .equ	CTC11	=4	; OBSOLETE! Use WGM13
+          .equ	CTC10	=3	; OBSOLETE! Use WGM12
+          .equ	WGM13	=4
+          .equ	WGM12	=3	
+          .equ	CTC1	=3		; Obsolete - Included for backward compatibility
+          .equ	CS12	=2
+          .equ	CS11	=1
+          .equ	CS10	=0
+         
+         ;TCCR2
+          .equ	FOC2	=7
+          .equ    PWM2    =6	; OBSOLETE! Use WGM20
+          .equ	WGM20	=6	
+          .equ    COM21   =5
+          .equ    COM20   =4
+          .equ    CTC2    =3	; OBSOLETE! Use WGM21
+          .equ	WGM21	=3	
+          .equ    CS22    =2
+          .equ    CS21    =1
+          .equ    CS20    =0
+         
+         ;SFIOR
+          .equ    ADHSM   =4
+          .equ    ACME    =3
+          .equ    PUD     =2
+          .equ	PSR2	=1
+          .equ	PSR10	=0
+         
+         ;WDTCR
+          .equ	WDCE	=4
+          .equ	WDTOE	=4
+          .equ	WDE	=3
+          .equ	WDP2	=2
+          .equ	WDP1	=1
+          .equ	WDP0	=0
+         
+         ;EECR
+          .equ    EERIE   =3
+          .equ	EEMWE	=2
+          .equ	EEWE	=1
+          .equ	EERE	=0
+         
+         ;PORTB
+          .equ	PB7	=7
+          .equ	PB6	=6
+          .equ	PB5	=5
+          .equ	PB4	=4
+          .equ	PB3	=3
+          .equ	PB2	=2
+          .equ	PB1	=1
+          .equ	PB0	=0
+         
+         ;DDRB
+          .equ	DDB7	=7
+          .equ	DDB6	=6
+          .equ	DDB5	=5
+          .equ	DDB4	=4
+          .equ	DDB3	=3
+          .equ	DDB2	=2
+          .equ	DDB1	=1
+          .equ	DDB0	=0
+         
+         ;PINB
+          .equ	PINB7	=7
+          .equ	PINB6	=6
+          .equ	PINB5	=5
+          .equ	PINB4	=4
+          .equ	PINB3	=3
+          .equ	PINB2	=2
+          .equ	PINB1	=1
+          .equ	PINB0	=0
+         
+         ;PORTC
+          .equ	PC6	=6
+          .equ	PC5	=5
+          .equ	PC4	=4
+          .equ	PC3	=3
+          .equ	PC2	=2
+          .equ	PC1	=1
+          .equ	PC0	=0
+         
+         ;DDRC
+          .equ	DDC6	=6
+          .equ	DDC5	=5
+          .equ	DDC4	=4
+          .equ	DDC3	=3
+          .equ	DDC2	=2
+          .equ	DDC1	=1
+          .equ	DDC0	=0
+         
+         ;PINC
+          .equ	PINC6	=6
+          .equ	PINC5	=5
+          .equ	PINC4	=4
+          .equ	PINC3	=3
+          .equ	PINC2	=2
+          .equ	PINC1	=1
+          .equ	PINC0	=0
+         
+         ;PORTD
+          .equ	PD7	=7
+          .equ	PD6	=6
+          .equ	PD5	=5
+          .equ	PD4	=4
+          .equ	PD3	=3
+          .equ	PD2	=2
+          .equ	PD1	=1
+          .equ	PD0	=0
+         
+         ;DDRD
+          .equ	DDD7	=7
+          .equ	DDD6	=6
+          .equ	DDD5	=5
+          .equ	DDD4	=4
+          .equ	DDD3	=3
+          .equ	DDD2	=2
+          .equ	DDD1	=1
+          .equ	DDD0	=0
+         
+         ;PIND
+          .equ	PIND7	=7
+          .equ	PIND6	=6
+          .equ	PIND5	=5
+          .equ	PIND4	=4
+          .equ	PIND3	=3
+          .equ	PIND2	=2
+          .equ	PIND1	=1
+          .equ	PIND0	=0
+         
+         ;UCSRA
+          .equ	RXC	=7
+          .equ	TXC	=6
+          .equ	UDRE	=5
+          .equ	FE	=4
+          .equ	OR	=3		; old name kept for compatibilty
+          .equ	DOR	=3
+          .equ	UPE	=2
+          .equ	PE	=2
+          .equ	U2X	=1
+          .equ	MPCM	=0
+         
+         ;UCSRB
+          .equ	RXCIE	=7
+          .equ	TXCIE	=6
+          .equ	UDRIE	=5
+          .equ	RXEN	=4
+          .equ	TXEN	=3
+          .equ	CHR9	=2		; old name kept for compatibilty
+          .equ	UCSZ2	=2
+          .equ	RXB8	=1
+          .equ	TXB8	=0
+         
+         ;UCSRC
+          .equ	URSEL	=7
+          .equ	UMSEL	=6
+          .equ	UPM1	=5
+          .equ	UPM0	=4
+          .equ	USBS	=3
+          .equ	UCSZ1	=2
+          .equ	UCSZ0	=1
+          .equ	UCPOL	=0
+         		
+         ;SPCR
+          .equ	SPIE	=7
+          .equ	SPE	=6
+          .equ	DORD	=5
+          .equ	MSTR	=4
+          .equ	CPOL	=3
+          .equ	CPHA	=2
+          .equ	SPR1	=1
+          .equ	SPR0	=0
+         
+         ;SPSR
+          .equ	SPIF	=7
+          .equ	WCOL	=6
+          .equ	SPI2X	=0
+         
+         ;ACSR
+          .equ	ACD	=7
+          .equ    ACBG    =6
+          .equ	ACO	=5
+          .equ	ACI	=4
+          .equ	ACIE	=3
+          .equ	ACIC	=2
+          .equ	ACIS1	=1
+          .equ	ACIS0	=0
+         
+         ;ADMUX
+          .equ    REFS1   =7
+          .equ    REFS0   =6
+          .equ    ADLAR   =5
+          .equ    MUX3    =3
+          .equ    MUX2    =2
+          .equ    MUX1    =1
+          .equ    MUX0    =0
+         
+         ;ADCSR
+          .equ    ADEN    =7
+          .equ    ADSC    =6
+          .equ    ADFR    =5
+          .equ    ADIF    =4
+          .equ    ADIE    =3
+          .equ    ADPS2   =2
+          .equ    ADPS1   =1
+          .equ    ADPS0   =0
+         
+         ; TWCR
+          .equ    TWINT   =7
+          .equ    TWEA    =6
+          .equ    TWSTA   =5
+          .equ    TWSTO   =4
+          .equ    TWWC    =3
+          .equ    TWEN    =2
+         
+          .equ    TWIE    =0
+         
+         ; TWAR
+          .equ    TWA6    =7
+          .equ    TWA5    =6
+          .equ    TWA4    =5
+          .equ    TWA3    =4
+          .equ    TWA2    =3
+          .equ    TWA1    =2
+          .equ    TWA0    =1
+          .equ    TWGCE   =0
+         
+         ; TWSR
+          .equ    TWS7    =7
+          .equ    TWS6    =6
+          .equ    TWS5    =5
+          .equ    TWS4    =4
+          .equ    TWS3    =3
+          .equ	TWPS1	=1
+          .equ	TWPS0	=0
+         
+         ;ASSR
+          .equ    AS2     =3
+          .equ    TCN2UB  =2
+          .equ    OCR2UB  =1
+          .equ    TCR2UB  =0
+         
+          .def	XL	=r26
+          .def	XH	=r27
+          .def	YL	=r28
+          .def	YH	=r29
+          .def	ZL	=r30
+          .def	ZH	=r31
+         
+          .equ 	RAMEND =$45F
+          .equ	FLASHEND =$FFF
+         
+         						;  byte groups
+         						;  /\/--\/--\/--\ 
+          .equ 	SMALLBOOTSTART	=0b00111110000000  ;($0F80) smallest boot block is 256
+          .equ 	SECONDBOOTSTART	=0b00111100000000  ;($0F00) 2'nd boot block size is 512
+          .equ 	THIRDBOOTSTART	=0b00111000000000  ;($0E00) third boot block size is 1K
+          .equ 	LARGEBOOTSTART	=0b00110000000000  ;($0C00) largest boot block is 2K
+          .equ 	BOOTSTART		=THIRDBOOTSTART  ;OBSOLETE!!! kept for compatibility
+          .equ	PAGESIZE		=32     ;number of WORDS in a page
+         
+          .equ	INT0addr=$001	; External Interrupt0 Vector Address
+          .equ	INT1addr=$002	; External Interrupt1 Vector Address
+          .equ	OC2addr =$003	; Output Compare2 Interrupt Vector Address
+          .equ	OVF2addr=$004	; Overflow2 Interrupt Vector Address
+          .equ	ICP1addr=$005	; Input Capture1 Interrupt Vector Address
+          .equ	OC1Aaddr=$006	; Output Compare1A Interrupt Vector Address
+          .equ	OC1Baddr=$007	; Output Compare1B Interrupt Vector Address
+          .equ	OVF1addr=$008	; Overflow1 Interrupt Vector Address
+          .equ	OVF0addr=$009	; Overflow0 Interrupt Vector Address
+          .equ	SPIaddr =$00a	; SPI Interrupt Vector Address
+          .equ	URXCaddr=$00b	; USART Receive Complete Interrupt Vector Address
+          .equ	UDREaddr=$00c	; USART Data Register Empty Interrupt Vector Address
+          .equ	UTXCaddr=$00d	; USART Transmit Complete Interrupt Vector Address
+          .equ	ADCCaddr=$00e	; ADC Interrupt Vector Address
+          .equ	ERDYaddr=$00f	; EEPROM Interrupt Vector Address
+          .equ	ACIaddr =$010	; Analog Comparator Interrupt Vector Address
+          .equ    TWIaddr =$011   ; Irq. vector address for Two-Wire Interface
+          .equ	SPMaddr =$012	; SPM complete Interrupt Vector Address
+          .equ	SPMRaddr =$012	; SPM complete Interrupt Vector Address
+          .def temp     = r16
+          .def cont10ms = r17
+          .def sonar    = r18 ; O : nota
+         						  ; 1 : silencio
+          .def sec1     = r19
+          .def sec2     = r20
+          .def silencio = r21
+          .def cont 	  = r22
+          .def notas    = r23
+          .def aux      = r24
+         
+          reset:
+000000 c022         rjmp start
+             .org $06
+000006 c000         rjmp isr_oc1a
+         
+         ;******************************************************************************
+         ;******************************************************************************
+         ;**********************  SUBRUTINA DE INTERRUPCION  ***************************
+         ;******************************************************************************
+         ;******************************************************************************
+         
+          isr_oc1a:
+000007 930f         push temp
+000008 b70f      	in temp, sreg
+000009 930f      	push temp
+00000a 1761      	cp cont, cont10ms   ;compara con el tiempo de espera deseado
+00000b f011      	breq pasaron10ms
+00000c 9563      	inc cont            ;sino, incrementa el cont de entradas
+00000d c008         rjmp salir_isr
+         
+          pasaron10ms:
+00000e e060      	ldi cont, 0			  ;reiniciamos el contador
+00000f 3020      	cpi sonar, 0        ;es el silencio de la nota o del silencio en si?
+000010 f009      	breq silencio_sonar
+000011 c002         rjmp silencio_silencio
+         
+          silencio_sonar:     ;sonar = 0
+000012 e051      	ldi silencio, 1
+000013 c002      	rjmp salir_isr
+         	
+          silencio_silencio:  ;sonar = 1
+000014 e050      	ldi silencio, 0	
+000015 c000      	rjmp salir_isr
+         	
+          salir_isr:	
+000016 910f      	pop temp
+000017 bf0f      	out sreg, temp
+000018 910f      	pop temp
+000019 9518      	reti
+         
+         ;******************************************************************************
+         ;******************************************************************************
+         ;**********************     CONFIGURACION TIMER1    ***************************
+         ;******************************************************************************
+         ;******************************************************************************
+         ;                           Modo CTC con OCR1A
+         ;                 0<<WGM13 1<<WGM12  0<<WGM11 0<<WGM10
+         ;
+         ;                          Preescalador = 1
+         ;                       0<<CS12 0<<CS11 1<<CS10
+         ;
+         ;                      interrupciones habilitadas
+         ;                              1<<OCIE1A
+         ;
+         ;                    generador de ondas habilitado
+         ;                          0<<COM1A1 1<<COM1A0
+         
+          conf_timer1:
+00001a 930f      	push temp
+00001b e400      	ldi temp, (0<<COM1A1)|(1<<COM1A0)|(0<<WGM11)|(0<<WGM10)
+00001c bd0f      	out TCCR1A, temp
+00001d e009      	ldi temp, (0<<WGM13) |(1<<WGM12) | (1<<CS10)
+00001e bd0e      	out TCCR1B, temp
+00001f e100      	ldi temp, 1<<OCIE1A
+000020 bf09      	out TIMSK, temp
+000021 910f      	pop temp
+000022 9508      	ret	
+         	
+         ;******************************************************************************
+         ;******************************************************************************
+         ;**********************    PROGRAMA PRINCIPAL  ********************************
+         ;******************************************************************************
+         ;******************************************************************************
+         ; 										IMPERIAL MARCH
+         ;
+         ; Primera parte: imperial_march_song
+         ;
+         ; orden    1  2  3  4   5   6  7   8   9  10 11 12  13  14  15  16  17  18
+         ; nota     G  G  G  D#  A#  G  D#  A#  G  D  D  D   D#  A#  F#  D#  A#  G
+         ; octava   3  3  3  3   3   3  3   3   3  4  4  4   4   3   3   3   3   3
+         ; avance   x  x  x  x   x   x  x   x   x  x  x  x   x   x   x   x   x   x
+         ;
+         ;    G   = 392Hz
+         ;    A#  = 466Hz
+         ;    D#  = 311Hz
+         ;    D4  = 587Hz
+         ;    F#  = 370Hz	
+         ;    D#4 = 622Hz
+         ;
+         ; Resto:         imperial_march_song_full
+         ;
+         ; orden   19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42
+         ; nota    G  G  G  G  F# F  E  D#  E G# C#  C  B A#  A A# D#  G D#  G A#  G A#  D	
+         ; octava  5  3  3  5  5  5  5  5   5  3  4  4  4  4  4  4  3  3  3  3  3  3  3  3
+         ; avance  x  x  x  x  x  x  x  x   x  x  x  x  x  x  x  x  x  x  x  x  x  x  x  x
+         ;
+         ; orden   43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
+         ; nota
+         ; octava
+         ; avance
+         ;
+         ;    G5  = 1568Hz
+         ;    F#5 = 1480Hz
+         ;    F5  = 1397Hz
+         ;    E5  = 1319Hz
+         ;    D#5 = 1245Hz
+         ;    G#  =  415Hz
+         ;    C#4 =  544Hz
+         ;    C4  =  523Hz
+         ;    B4  =  988Hz
+         ;    A#4 =  932Hz
+         ;    A4  =  880Hz
+         ;
+         ;  Para determinar el valor de OCR1A:
+         ;  P=1
+         ;  N = fin/(2*fout) - 1;
+         ;
+         ; Disposicion de LEDS
+         ;
+         ;                   PD0   PD1                  PD2  PD3
+         ;                   sec1 sec2                 sec2  sec1
+         ;
+         ;
+         ;
+         ;                              DARTH VADER
+         ;
+         ;
+         ;
+         ;                   PD4   PD5                  PD6  PD7
+         ;                   sec1 sec2                 sec2  sec1
+         ;
+          start:
+000023 e004      	ldi temp, high(ramend)
+000024 bf0e      	out SPH, temp
+000025 e50f      	ldi temp, low(ramend)
+000026 bf0d      	out SPL, temp
+000027 e002      	ldi temp, 2        ;todos como salida
+000028 bb07      	out ddrb, temp  		;OC1A salida	
+000029 ef0f      	ldi temp, $FF
+00002a bb01      	out ddrd, temp       ;PORTD como salida
+00002b e000      	ldi temp, 0
+00002c bb02      	out portd, temp      ;comenzan apagados
+00002d e071      	ldi notas, 1         ;inicializamos a la primera nota
+00002e e050      	ldi silencio, 0
+00002f e060      	ldi cont, 0
+000030 e020      	ldi sonar, 0
+000031 e939      	ldi sec1, 0b10011001
+000032 e646      	ldi sec2, 0b01100110
+000033 dfe6      	rcall conf_timer1
+000034 9478      	SEI
+         	
+          imperial_march:
+000035 3071         cpi notas, 1
+000036 f009      	breq notaGnollega
+000037 c001      	rjmp sigue1
+         
+          notaGnollega:
+000038 c0f4      	rjmp notaG
+         		
+          sigue1:	
+000039 3072      	cpi notas, 2
+00003a f3e9      	breq notaGnollega
+         		
+00003b 3073      	cpi notas, 3
+00003c f3d9      	breq notaGnollega
+         	
+00003d 3074      	cpi notas, 4
+00003e f009      	breq notaDsharpnollega
+00003f c001      	rjmp sigue2
+         	
+          notaDsharpnollega:
+000040 c112      	rjmp notaDsharp
+         		
+          sigue2:
+000041 3075      	cpi notas, 5
+000042 f009      	breq notaAsharpnollega
+000043 c001      	rjmp sigue3
+         	
+          notaAsharpnollega:
+000044 c130      	rjmp notaAsharp
+         	
+          sigue3:	
+000045 3076      	cpi notas, 6
+000046 f389      	breq notaGnollega
+         		
+000047 3077      	cpi notas, 7
+000048 f3b9      	breq notaDsharpnollega
+         	
+000049 3078      	cpi notas, 8
+00004a f3c9      	breq notaAsharpnollega
+         	
+00004b 3079      	cpi notas, 9
+00004c f009      	breq notaG2nollega
+00004d c001      	rjmp sigue4
+         	
+          notaG2nollega:
+00004e c14a      	rjmp notaG2	
+         	
+          sigue4:	
+00004f 307a      	cpi notas, 10
+000050 f009      	breq notaD4nollega
+000051 c001      	rjmp sigue5
+         	
+          notaD4nollega:
+000052 c164      	rjmp notaD4		
+         		
+          sigue5:	
+000053 307b      	cpi notas, 11
+000054 f3e9      	breq notaD4nollega
+         	
+000055 307c      	cpi notas, 12
+000056 f3d9      	breq notaD4nollega
+         	
+000057 307d      	cpi notas, 13
+000058 f009      	breq notaDsharp4nollega
+000059 c001      	rjmp sigue6
+         	
+          notaDsharp4nollega:
+00005a c186      	rjmp notaDsharp4
+         				
+          sigue6:	
+00005b 307e      	cpi notas, 14
+00005c f009      	breq notaAsharpcarajonollega
+00005d c001      	rjmp sigue7
+         	
+          notaAsharpcarajonollega:
+00005e c19f      	rjmp notaAsharpcarajo
+         		
+          sigue7:	
+00005f 307f      	cpi notas, 15
+000060 f009      	breq notaFsharpnollega
+000061 c001      	rjmp sigue8
+         	
+          notaFsharpnollega:
+000062 c1b4      	rjmp notaFsharp
+         	
+          sigue8:	
+000063 3170      	cpi notas, 16
+000064 f2d9      	breq notaDsharpnollega
+         
+000065 3171      	cpi notas, 17
+000066 f2e9      	breq notaAsharpnollega
+         	
+000067 3172      	cpi notas, 18
+000068 f009      	breq notaGlarganollega
+000069 c001      	rjmp sigue9
+         
+          notaGlarganollega:
+00006a c1c4      	rjmp notaGlarga	
+         	
+          sigue9:	
+00006b 3173      	cpi notas, 19
+00006c f009      	breq notaG5nollega
+00006d c001      	rjmp sigue10
+         
+          notaG5nollega:
+00006e c1dd      	rjmp notaG5
+         	
+          sigue10:	
+00006f 3174      	cpi notas, 20
+000070 f009      	breq notaGestacatonollega
+000071 c001      	rjmp sigue11
+         
+          notaGestacatonollega:
+000072 c209      	rjmp notaGestacato
+         	
+          sigue11:	
+000073 3175      	cpi notas, 21
+000074 f009      	breq notaGcortanollega
+000075 c001      	rjmp sigue12
+         	
+          notaGcortanollega:
+000076 c21d      	rjmp notaGcorta	
+         	
+          sigue12:	
+000077 3176      	cpi notas, 22
+000078 f3a9      	breq notaG5nollega
+         	
+000079 3177      	cpi notas, 23
+00007a f009      	breq notaFsharp5nollega
+00007b c001      	rjmp sigue13
+         	
+          notaFsharp5nollega:
+00007c c22f      	rjmp notaFsharp5	
+         		
+          sigue13:	
+00007d 3178      	cpi notas, 24
+00007e f009         breq notaF5nollega
+00007f c001         rjmp sigue14
+         
+          notaF5nollega:
+000080 c24a      	rjmp notaF5
+         
+          sigue14:
+000081 3179         cpi notas, 25
+000082 f009         breq notaE5nollega
+000083 c001      	rjmp sigue15
+         
+          notaE5nollega:
+000084 c264      	rjmp notaE5
+         
+          sigue15:
+000085 317a         cpi notas, 26
+000086 f009         breq notaDsharp5nollega
+000087 c001         rjmp sigue16
+         
+          notaDsharp5nollega:
+000088 c27c      	rjmp notaDsharp5
+         
+          sigue16:
+000089 317b         cpi notas, 27
+00008a f009         breq notaE5silencionollega
+00008b c001         rjmp sigue17
+         
+          notaE5silencionollega:
+00008c c294      	rjmp notaE5silencio
+         
+          sigue17:
+00008d 317c         cpi notas, 28
+00008e f009         breq nota28Gsharpnollega
+00008f c001         rjmp sigue18
+         
+          nota28Gsharpnollega:
+000090 c2b2      	rjmp nota28Gsharp
+         	
+          sigue18:
+000091 317d         cpi notas, 29
+000092 f009         breq nota29Csharpnollega
+000093 c001         rjmp sigue19
+         
+          nota29Csharpnollega:		
+000094 c2ca      	rjmp nota29Csharp
+         
+          sigue19:
+000095 317e         cpi notas, 30
+000096 f009         breq nota30Cnollega
+000097 c001         rjmp sigue20
+         
+          nota30Cnollega:
+000098 c2e2      	rjmp nota30C
+         
+          sigue20:
+000099 317f         cpi notas, 31
+00009a f009         breq nota31Bnollega
+00009b c001      	rjmp sigue21
+         	
+          nota31Bnollega:
+00009c c2f6      	rjmp nota31B
+         		
+          sigue21:
+00009d 3270         cpi notas, 32
+00009e f009         breq nota32Asharpnollega
+00009f c001      	rjmp sigue22
+         	
+          nota32Asharpnollega:
+0000a0 c30a      	rjmp nota32Asharp
+         
+          sigue22:
+0000a1 3271      	cpi notas, 33
+0000a2 f009      	breq nota33Anollega
+0000a3 c001      	rjmp sigue23
+         
+          nota33Anollega:
+0000a4 c31e      	rjmp nota33A
+         
+          sigue23:	
+0000a5 3272         cpi notas, 34
+0000a6 f009         breq nota34Asharpnollega
+0000a7 c001         rjmp sigue24
+         
+          nota34Asharpnollega:
+0000a8 c332      	rjmp nota34Asharp
+         
+          sigue24:
+0000a9 3273      	cpi notas, 35
+0000aa f009      	breq nota35Dsharpnollega
+0000ab c001      	rjmp sigue25
+         	
+          nota35Dsharpnollega:	
+0000ac c34d      	rjmp nota35Dsharp	
+         		
+          sigue25:	
+0000ad 3274      	cpi notas, 36
+0000ae f009      	breq nota36Gnollega
+0000af c001      	rjmp sigue26
+         	
+          nota36Gnollega:
+0000b0 c361      	rjmp nota36G	
+         		
+          sigue26:	
+0000b1 3275      	cpi notas, 37
+0000b2 f009      	breq nota37Dsharpnollega
+0000b3 c001      	rjmp sigue27
+         	
+          nota37Dsharpnollega:
+0000b4 c375      	rjmp nota37Dsharp	
+         		
+          sigue27:	
+0000b5 3276      	cpi notas, 38
+0000b6 f009      	breq nota38Gnollega
+0000b7 c001      	rjmp sigue28
+         	
+          nota38Gnollega:
+0000b8 c389      	rjmp nota38G	
+         		
+          sigue28:	
+0000b9 3277      	cpi notas, 39
+0000ba f009      	breq nota39Asharpnollega
+0000bb c001      	rjmp sigue29
+         	
+          nota39Asharpnollega:
+0000bc c39d      	rjmp nota39Asharp	
+          sigue29:	
+0000bd 3278      	cpi notas, 40
+0000be f009      	breq nota40Gnollega
+0000bf c001      	rjmp sigue30
+         	
+          nota40Gnollega:
+0000c0 c3b1      	rjmp nota40G	
+         			
+          sigue30:	
+0000c1 3279      	cpi notas, 41
+0000c2 f009      	breq nota41Asharpnollega
+0000c3 c001      	rjmp sigue31
+         	
+          nota41Asharpnollega:
+0000c4 c3c5      	rjmp nota41Asharp
+         	
+          sigue31:	
+0000c5 327a      	cpi notas, 42
+0000c6 f009      	breq nota42Dnollega
+0000c7 c001      	rjmp sigue32
+         	
+          nota42Dnollega:
+0000c8 c3d9      	rjmp nota42D	
+         		
+          sigue32:	
+0000c9 327b      	cpi notas, 43
+0000ca f009      	breq notaG5_2
+0000cb c001         rjmp sigue33
+         
+          notaG5_2:
+0000cc c17f      	rjmp notaG5
+         	
+          sigue33:	
+0000cd 327c      	cpi notas, 44
+0000ce f009      	breq notaGestacato_2
+0000cf c001         rjmp sigue34
+         
+          notaGestacato_2:
+0000d0 c1ab      	rjmp notaGestacato	
+         
+          sigue34:	
+0000d1 327d      	cpi notas, 45
+0000d2 f009      	breq notaGcorta_2
+0000d3 c001      	rjmp sigue35
+         	
+          notaGcorta_2:
+0000d4 c1bf      	rjmp notaGcorta	
+         
+          sigue35:	 	
+0000d5 327e      	cpi notas, 46
+0000d6 f009      	breq notaG5_3
+0000d7 c001      	rjmp sigue36
+         	
+          notaG5_3:
+0000d8 c173      	rjmp notaG5	
+         	
+          sigue36:	
+0000d9 327f      	cpi notas, 47
+0000da f009      	breq notaFsharp5_2
+0000db c001      	rjmp sigue37
+         	
+          notaFsharp5_2:
+0000dc c1cf      	rjmp notaFsharp5	
+         		
+          sigue37:	
+0000dd 3370      	cpi notas, 48
+0000de f009      	breq notaF5_2
+0000df c001      	rjmp sigue38
+         
+          notaF5_2:
+0000e0 c1ea      	rjmp notaF5
+         		
+          sigue38:	
+0000e1 3371      	cpi notas, 49
+0000e2 f009      	breq notaE5_2
+0000e3 c001      	rjmp sigue39
+         
+          notaE5_2:
+0000e4 c204      	rjmp notaE5
+         	
+          sigue39:		
+0000e5 3372      	cpi notas, 50
+0000e6 f009      	breq notaDsharp5_2
+0000e7 c001      	rjmp sigue40
+         
+          notaDsharp5_2:
+0000e8 c21c      	rjmp notaDsharp5
+         		
+          sigue40:	
+0000e9 3373      	cpi notas, 51
+0000ea f009      	breq notaE5silencio_2
+0000eb c001         rjmp sigue41
+         
+          notaE5silencio_2:
+0000ec c234       	rjmp notaE5silencio
+          	
+          sigue41:		
+0000ed 3374      	cpi notas, 52
+0000ee f009      	breq nota28Gsharp_2
+0000ef c001      	rjmp sigue42
+         
+          nota28Gsharp_2:
+0000f0 c252      	rjmp nota28Gsharp
+         		
+          sigue42:	
+0000f1 3375      	cpi notas, 53
+0000f2 f009      	breq nota29Csharp_2
+0000f3 c001      	rjmp sigue43
+         
+          nota29Csharp_2:
+0000f4 c26a      	rjmp nota29Csharp
+         		
+          sigue43:	
+0000f5 3376      	cpi notas, 54
+0000f6 f009      	breq nota30C_2
+0000f7 c001         rjmp sigue44
+         
+          nota30C_2:
+0000f8 c282      	rjmp nota30C
+         	
+          sigue44:	
+0000f9 3377      	cpi notas, 55
+0000fa f009      	breq nota31B_2
+0000fb c001      	rjmp sigue45
+         	
+          nota31B_2:
+0000fc c296      	rjmp nota31B
+         		
+          sigue45:	
+0000fd 3378      	cpi notas, 56
+0000fe f009      	breq nota32Asharp_2
+0000ff c001      	rjmp sigue46
+         	
+          nota32Asharp_2:
+000100 c2aa      	rjmp nota32Asharp	
+         	
+          sigue46:	
+000101 3379      	cpi notas, 57
+000102 f009      	breq nota33A_2
+000103 c001      	rjmp sigue47
+         	
+          nota33A_2:
+000104 c2be      	rjmp nota33A	
+         	
+          sigue47:	
+000105 337a      	cpi notas, 58
+000106 f009      	breq nota34Asharp_2
+000107 c001      	rjmp sigue48
+         	
+          nota34Asharp_2:
+000108 c2d2      	rjmp nota34Asharp
+         	
+          sigue48:	
+000109 337b      	cpi notas, 59
+00010a f009      	breq nota35Dsharp_2
+00010b c001      	rjmp sigue49
+         	
+          nota35Dsharp_2:	
+00010c c2ed      	rjmp nota35Dsharp
+         	
+          sigue49:	
+00010d 337c      	cpi notas, 60
+00010e f009      	breq nota36G_2
+00010f c001      	rjmp sigue50
+         	
+          nota36G_2:
+000110 c301      	rjmp nota36G
+         		
+          sigue50:	
+000111 337d      	cpi notas, 61
+000112 f009      	breq nota37Dsharp_2
+000113 c001      	rjmp sigue51
+         
+          nota37Dsharp_2:
+000114 c315      	rjmp nota37Dsharp
+         		
+          sigue51:	
+000115 337e      	cpi notas, 62
+000116 f009      	breq nota38G_2
+000117 c001      	rjmp sigue52
+         
+          nota38G_2:
+000118 c329      	rjmp nota38G
+         		
+          sigue52:	
+000119 337f      	cpi notas, 63
+00011a f009      	breq nota39Asharp_2
+00011b c001      	rjmp sigue53
+         
+          nota39Asharp_2:
+00011c c33d      	rjmp nota39Asharp	
+         	
+          sigue53:	
+00011d 3470      	cpi notas, 64                      ;AQUI ESTAMOS!
+00011e f009      	breq nota64Dsharp_2
+00011f c001      	rjmp sigue54
+         
+          nota64Dsharp_2:
+000120 c3a1      	rjmp nota64Dsharp
+         	
+          sigue54:	
+000121 3471      	cpi notas, 65
+000122 f009      	breq nota65Asharp_2
+000123 c001         rjmp sigue55
+         
+          nota65Asharp_2:
+000124 c3b5      	rjmp nota65Asharp	
+         	
+          sigue55:	
+000125 3472      	cpi notas, 66
+000126 f009      	breq nota66G_2
+000127 c001         rjmp forever
+         
+          nota66G_2:
+000128 c3c9      	rjmp nota66G	
+         								
+          forever:
+000129 94f8         CLI
+00012a e000         ldi temp, 0
+00012b bb08         out portb, temp
+00012c cffc      	rjmp forever
+         
+         ;***********************************NOTA 1*************************************
+         ;***********************************NOTA 2*************************************
+         ;***********************************NOTA 3*************************************
+         ;***********************************NOTA 6*************************************
+          notaG:
+00012d e020      	ldi sonar, 0
+00012e e004      	ldi temp, high(1275)
+00012f bd0b      	out OCR1AH, temp
+000130 ef0b      	ldi temp, low(1275)
+000131 bd0a      	out OCR1AL, temp
+000132 e002      	ldi temp, 2
+000133 bb07      	out ddrb, temp
+000134 ef1b      	ldi cont10ms, 251      ;tiempo que durara la nota
+000135 3071      	cpi notas, 1
+000136 f031      	breq sec1_G
+000137 3072      	cpi notas, 2
+000138 f039      	breq sec2_G
+000139 3073      	cpi notas, 3
+00013a f011      	breq sec1_G
+00013b 3076      	cpi notas, 6
+00013c f019      	breq sec2_G
+         	
+          sec1_G:
+00013d 9573      	inc notas
+00013e bb32      	out portd, sec1
+00013f c003      	rjmp sonando1236
+         	
+          sec2_G:
+000140 9573      	inc notas
+000141 bb42      	out portd, sec2
+000142 c000      	rjmp sonando1236
+         	
+          sonando1236:
+000143 3051      	cpi silencio, 1        ;aqui "ocurren" interrupciones
+000144 f7f1      	brne sonando1236       ;sino son iguales sigo reproduciendo la nota
+         	                       ;si llego aca sono lo que debia sonar
+000145 e021      	ldi sonar, 1           ;le toca el silencio al silencio en si
+000146 ed1c      	ldi cont10ms, 220      ;tiempo que durara el silencio
+000147 e000      	ldi temp, 0<<COM1A0    ;dejamos de emitir la nota
+000148 bd0f      	out TCCR1A, temp
+000149 e000      	ldi temp, 0
+00014a bb08      	out portb, temp
+         	
+          silencio1236:
+00014b 3050         cpi silencio, 0        ;aqui "ocurren" interrupciones
+00014c f7f1      	brne silencio1236
+         	
+00014d e400      	ldi temp, 1<<COM1A0
+00014e bd0f      	out TCCR1A, temp
+00014f e000      	ldi temp, 0
+000150 bd0b      	out OCR1AH, temp
+000151 bd0a      	out OCR1AL, temp
+000152 cee2      	rjmp imperial_march
+         
+         ;***********************************NOTA 4*************************************
+         ;***********************************NOTA 7*************************************
+         ;***********************************NOTA 16************************************
+          notaDsharp:
+000153 e020      	ldi sonar, 0
+000154 e006      	ldi temp, high(1607)
+000155 bd0b      	out OCR1AH, temp
+000156 e407      	ldi temp, low(1607)
+000157 bd0a      	out OCR1AL, temp
+000158 eb15      	ldi cont10ms, 181   ;tiempo que durara la nota
+000159 3074      	cpi notas, 4
+00015a f039      	breq sec2_Dsharp
+00015b 3077      	cpi notas, 7
+00015c f011      	breq sec1_Dsharp
+00015d 3170      	cpi notas, 16
+00015e f019      	breq sec2_Dsharp
+         
+          sec1_Dsharp:
+00015f 9573      	inc notas
+000160 bb32      	out portd, sec1
+000161 c003      	rjmp sonando47_16
+         	
+          sec2_Dsharp:
+000162 9573      	inc notas
+000163 bb42      	out portd, sec2
+000164 c000      	rjmp sonando47_16	
+         	
+          sonando47_16:
+000165 3051      	cpi silencio, 1     ;aqui "ocurren" interrupciones
+000166 f7f1      	brne sonando47_16   ;sino son iguales sigo reproduciendo la nota
+         	                    ;si llego aca sono lo que debia sonar
+000167 e021      	ldi sonar, 1        ;le toca el silencio al silencio en si
+000168 e312      	ldi cont10ms, 50    ;tiempo que durara el silencio
+000169 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+00016a bd0f      	out TCCR1A, temp
+00016b e000      	ldi temp, 0
+00016c bb08      	out portb, temp
+         	
+          silencio47_16:
+00016d 3050         cpi silencio, 0     ;aqui "ocurren" interrupciones
+00016e f7f1      	brne silencio47_16
+         	
+00016f e400      	ldi temp, 1<<COM1A0
+000170 bd0f      	out TCCR1A, temp
+000171 e000      	ldi temp, 0
+000172 bd0b      	out OCR1AH, temp
+000173 bd0a      	out OCR1AL, temp
+000174 cec0      	rjmp imperial_march
+         
+         ;***********************************NOTA 5*************************************
+         ;***********************************NOTA 8*************************************
+          notaAsharp:
+000175 e020      	ldi sonar, 0
+000176 e004      	ldi temp, high(1072)
+000177 bd0b      	out OCR1AH, temp
+000178 e300      	ldi temp, low(1072)
+000179 bd0a      	out OCR1AL, temp
+00017a ec18      	ldi cont10ms, 200    ;tiempo que durara la nota
+00017b 3075      	cpi notas, 5
+00017c f031      	breq sec1_Asharp
+00017d 3078      	cpi notas, 8
+00017e f039      	breq sec2_Asharp
+00017f 307e      	cpi notas, 14
+000180 f029      	breq sec2_Asharp
+000181 3171      	cpi notas, 17
+000182 f001      	breq sec1_Asharp
+         
+          sec1_Asharp:
+000183 9573      	inc notas
+000184 bb32      	out portd, sec1
+000185 c003      	rjmp sonando58
+         	
+          sec2_Asharp:
+000186 9573         inc notas
+000187 bb42      	out portd, sec2
+000188 c000      	rjmp sonando58		
+         	
+          sonando58:
+000189 3051      	cpi silencio, 1      ;aqui "ocurren" interrupciones
+00018a f7f1      	brne sonando58       ;sino son iguales sigo reproduciendo la nota
+         	                     ;si llego aca sono lo que debia sonar
+00018b e021      	ldi sonar, 1         ;le toca el silencio al silencio en si
+00018c e510      	ldi cont10ms, 80    ;tiempo que durara el silencio
+00018d e000      	ldi temp, 0<<COM1A0  ;dejamos de emitir la nota
+00018e bd0f      	out TCCR1A, temp
+00018f e000      	ldi temp, 0
+000190 bb08      	out portb, temp
+         	
+          silencio58:
+000191 3050         cpi silencio, 0      ;aqui "ocurren" interrupciones
+000192 f7f1      	brne silencio58
+         	
+000193 e400      	ldi temp, 1<<COM1A0
+000194 bd0f      	out TCCR1A, temp
+000195 e000      	ldi temp, 0
+000196 bd0b      	out OCR1AH, temp
+000197 bd0a      	out OCR1AL, temp
+000198 ce9c      	rjmp imperial_march
+         
+         ;***********************************NOTA 9*************************************
+          notaG2:
+000199 e020      	ldi sonar, 0
+00019a e004      	ldi temp, high(1275)
+00019b bd0b      	out OCR1AH, temp
+00019c ef0b      	ldi temp, low(1275)
+00019d bd0a      	out OCR1AL, temp
+00019e ef1b      	ldi cont10ms, 251    ;con ese valor espera el tiempo deseado
+00019f 9573         inc notas
+0001a0 bb42      	out portd, sec2		
+         	
+          sonando9:
+0001a1 3051      	cpi silencio, 1     ;aqui "ocurren" interrupciones
+0001a2 f7f1      	brne sonando9
+0001a3 e050      	ldi silencio, 0
+         	
+          sonando9_extra:	
+0001a4 3051      	cpi silencio, 1     ;aqui "ocurren" interrupciones
+0001a5 f7f1      	brne sonando9_extra  ;si llego aca sono lo que debia sonar
+         	
+0001a6 e021      	ldi sonar, 1        ;le toca el silencio al silencio en si
+0001a7 ed1c      	ldi cont10ms, 220     ;valor para que no suene
+0001a8 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0001a9 bd0f      	out TCCR1A, temp
+0001aa e000      	ldi temp, 0
+0001ab bb08      	out portb, temp
+         	
+          silencio9:
+0001ac 3050         cpi silencio, 0   ;aqui "ocurren" interrupciones
+0001ad f7f1      	brne silencio9
+0001ae e051      	ldi silencio, 1
+         	
+          silencio9_extra:
+0001af 3050      	cpi silencio, 0
+0001b0 f7f1      	brne silencio9_extra
+         	
+0001b1 e400      	ldi temp, 1<<COM1A0
+0001b2 bd0f      	out TCCR1A, temp
+0001b3 e000      	ldi temp, 0
+0001b4 bd0b      	out OCR1AH, temp
+0001b5 bd0a      	out OCR1AL, temp
+0001b6 ce7e      	rjmp imperial_march
+         
+         ;***********************************NOTA 10************************************
+         ;***********************************NOTA 11************************************
+         ;***********************************NOTA 12************************************
+          notaD4:
+0001b7 e020      	ldi sonar, 0
+0001b8 e003      	ldi temp, high(851)
+0001b9 bd0b      	out OCR1AH, temp
+0001ba e503      	ldi temp, low(851)
+0001bb bd0a      	out OCR1AL, temp
+0001bc ef1b      	ldi cont10ms, 251     ;el valor calculado enverdad es 384
+0001bd 307a      	cpi notas, 10
+0001be f039      	breq sec2_D4
+0001bf 307b      	cpi notas, 11
+0001c0 f011      	breq sec1_D4
+0001c1 307c      	cpi notas, 12
+0001c2 f019      	breq sec2_D4
+         
+          sec1_D4:
+0001c3 9573      	inc notas
+0001c4 bb32      	out portd, sec1
+0001c5 c003      	rjmp sonando10_11_12
+         	
+          sec2_D4:
+0001c6 9573         inc notas
+0001c7 bb42      	out portd, sec2
+0001c8 c000      	rjmp sonando10_11_12
+         	
+          sonando10_11_12:
+0001c9 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0001ca f7f1      	brne sonando10_11_12  ;sino son iguales sigo reproduciendo la nota
+0001cb e050      	ldi silencio, 0
+0001cc e815      	ldi cont10ms, 133     ;por esto se usan 2 veces, no cabe en 8 bits
+         	
+          sonando10_11_12_extra:
+0001cd 3051      	cpi silencio, 1
+0001ce f7f1      	brne sonando10_11_12_extra
+         	                      ;si llego aca sono lo que debia sonar
+0001cf e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0001d0 ef1b      	ldi cont10ms, 251     ;el verdadero valor es 336
+0001d1 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0001d2 bd0f      	out TCCR1A, temp
+0001d3 e000      	ldi temp, 0
+0001d4 bb08      	out portb, temp
+         	
+          silencio10_11_12:
+0001d5 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0001d6 f7f1      	brne silencio10_11_12
+0001d7 e051      	ldi silencio, 1
+0001d8 e515      	ldi cont10ms, 85
+         	
+          silencio10_11_12_extra:
+0001d9 3050      	cpi silencio, 0
+0001da f7f1      	brne silencio10_11_12_extra
+         		
+0001db e400      	ldi temp, 1<<COM1A0
+0001dc bd0f      	out TCCR1A, temp
+0001dd e000      	ldi temp, 0
+0001de bd0b      	out OCR1AH, temp
+0001df bd0a      	out OCR1AL, temp
+0001e0 ce54      	rjmp imperial_march
+         
+         ;***********************************NOTA 13************************************
+          notaDsharp4:
+0001e1 e020      	ldi sonar, 0
+0001e2 e003      	ldi temp, high(803)
+0001e3 bd0b      	out OCR1AH, temp
+0001e4 e203      	ldi temp, low(803)
+0001e5 bd0a      	out OCR1AL, temp
+0001e6 9573      	inc notas
+0001e7 ef1b      	ldi cont10ms, 251   ;valor para que suene
+0001e8 bb32      	out portd, sec1
+         	
+          sonando13:
+0001e9 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0001ea f7f1      	brne sonando13  ;sino son iguales sigo reproduciendo la nota
+0001eb e050      	ldi silencio, 0
+0001ec e916      	ldi cont10ms, 150
+         	
+          sonando13_extra:
+0001ed 3051      	cpi silencio, 1
+0001ee f7f1      	brne sonando13_extra
+         	                      ;si llego aca sono lo que debia sonar
+0001ef e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0001f0 e51a      	ldi cont10ms, 90     ;valor para que no suene
+0001f1 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0001f2 bd0f      	out TCCR1A, temp
+0001f3 e000      	ldi temp, 0
+0001f4 bb08      	out portb, temp
+         	
+          silencio13:
+0001f5 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0001f6 f7f1      	brne silencio13
+0001f7 e051      	ldi silencio, 1
+         			
+0001f8 e400      	ldi temp, 1<<COM1A0
+0001f9 bd0f      	out TCCR1A, temp
+0001fa e000      	ldi temp, 0
+0001fb bd0b      	out OCR1AH, temp
+0001fc bd0a      	out OCR1AL, temp
+0001fd ce37      	rjmp imperial_march
+         
+         ;***********************************NOTA 14************************************
+          notaAsharpcarajo:
+0001fe e020      	ldi sonar, 0
+0001ff e004      	ldi temp, high(1072)
+000200 bd0b      	out OCR1AH, temp
+000201 e300      	ldi temp, low(1072)
+000202 bd0a      	out OCR1AL, temp
+000203 9573      	inc notas
+000204 eb14      	ldi cont10ms, 180    ;tiempo que durara la nota
+000205 bb42         out portd, sec2	
+000206 e050      	ldi silencio, 0
+         	
+          sonando14:
+000207 3051      	cpi silencio, 1      ;aqui "ocurren" interrupciones
+000208 f7f1      	brne sonando14 ;sino son iguales sigo reproduciendo la nota
+         	                     ;si llego aca sono lo que debia sonar
+000209 e021      	ldi sonar, 1         ;le toca el silencio al silencio en si
+00020a e31c      	ldi cont10ms, 60    ;tiempo que durara el silencio
+00020b e000      	ldi temp, 0<<COM1A0  ;dejamos de emitir la nota
+00020c bd0f      	out TCCR1A, temp
+00020d e000      	ldi temp, 0
+00020e bb08      	out portb, temp
+         	
+          silencio14:
+00020f 3050         cpi silencio, 0      ;aqui "ocurren" interrupciones
+000210 f7f1      	brne silencio14
+         	
+000211 e400      	ldi temp, 1<<COM1A0
+000212 bd0f      	out TCCR1A, temp
+000213 e000      	ldi temp, 0
+000214 bd0b      	out OCR1AH, temp
+000215 bd0a      	out OCR1AL, temp
+000216 ce1e      	rjmp imperial_march
+         
+         ;***********************************NOTA 15************************************
+          notaFsharp:
+000217 e020         ldi sonar, 0
+000218 e005      	ldi temp, high(1350)
+000219 bd0b      	out OCR1AH, temp
+00021a e406      	ldi temp, low(1350)
+00021b bd0a      	out OCR1AL, temp
+00021c 9573      	inc notas
+00021d ef1b      	ldi cont10ms, 251   ;valor para que suene
+00021e bb32      	out portd, sec1
+         	
+          sonando15:
+00021f 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+000220 f7f1      	brne sonando15  ;sino son iguales sigo reproduciendo la nota
+         	                      ;si llego aca sono lo que debia sonar
+000221 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000222 ef1b      	ldi cont10ms, 251       ;valor para que no suene
+000223 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000224 bd0f      	out TCCR1A, temp
+000225 e000      	ldi temp, 0
+000226 bb08      	out portb, temp
+         	
+          silencio15:
+000227 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000228 f7f1      	brne silencio15
+         	
+000229 e400      	ldi temp, 1<<COM1A0
+00022a bd0f      	out TCCR1A, temp
+00022b e000      	ldi temp, 0
+00022c bd0b      	out OCR1AH, temp
+00022d bd0a      	out OCR1AL, temp
+00022e ce06      	rjmp imperial_march
+         
+         ;***********************************NOTA 18************************************
+          notaGlarga:
+00022f e020      	ldi sonar, 0
+000230 e004      	ldi temp, high(1275)
+000231 bd0b      	out OCR1AH, temp
+000232 ef0b      	ldi temp, low(1275)
+000233 bd0a      	out OCR1AL, temp
+000234 e002      	ldi temp, 2
+000235 bb07      	out ddrb, temp
+000236 9573      	inc notas
+000237 ef1b      	ldi cont10ms, 251      ;tiempo que durara la nota
+000238 bb42      	out portd, sec2
+         	
+          sonando18:
+000239 3051      	cpi silencio, 1        ;aqui "ocurren" interrupciones
+00023a f7f1      	brne sonando18    ;sino son iguales sigo reproduciendo la nota
+         	
+00023b e050      	ldi silencio, 0
+         	
+          sonando18_extra:
+00023c 3051      	cpi silencio, 1
+00023d f7f1      	brne sonando18_extra
+         	                       ;si llego aca sono lo que debia sonar
+00023e e021      	ldi sonar, 1           ;le toca el silencio al silencio en si
+00023f ed1c      	ldi cont10ms, 220      ;tiempo que durara el silencio
+000240 e000      	ldi temp, 0<<COM1A0    ;dejamos de emitir la nota
+000241 bd0f      	out TCCR1A, temp
+000242 e000      	ldi temp, 0
+000243 bb08      	out portb, temp
+         	
+          silencio18:
+000244 3050         cpi silencio, 0        ;aqui "ocurren" interrupciones
+000245 f7f1      	brne silencio18
+         	
+000246 e400      	ldi temp, 1<<COM1A0
+000247 bd0f      	out TCCR1A, temp
+000248 e000      	ldi temp, 0
+000249 bd0b      	out OCR1AH, temp
+00024a bd0a      	out OCR1AL, temp
+00024b cde9      	rjmp imperial_march
+         
+         ;***********************************NOTA 19************************************
+         ;***********************************NOTA 22************************************
+          notaG5:
+00024c e020         ldi sonar, 0
+00024d e001      	ldi temp, high(318)
+00024e bd0b      	out OCR1AH, temp
+00024f e30e      	ldi temp, low(318)
+000250 bd0a      	out OCR1AL, temp
+000251 ef1b      	ldi cont10ms, 251   ;valor para que suene
+000252 3173      	cpi notas, 19
+000253 f011      	breq sec1_G5
+000254 3176      	cpi notas, 22
+000255 f019      	breq sec2_G5
+         
+          sec1_G5:
+000256 9573      	inc notas
+000257 bb32      	out portd, sec1
+000258 c003      	rjmp sonando19_22
+         	
+          sec2_G5:
+000259 9573         inc notas
+00025a bb42      	out portd, sec2
+00025b c000      	rjmp sonando19_22
+         	
+          sonando19_22:
+00025c 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00025d f7f1      	brne sonando19_22  ;sino son iguales sigo reproduciendo la nota
+         	
+00025e e050      	ldi silencio, 0
+         	
+          sonando19_22_extra:
+00025f 3051      	cpi silencio, 1
+000260 f7f1      	brne sonando19_22_extra
+         	
+000261 e050      	ldi silencio, 0
+         	
+          sonando19_22_extra1:
+000262 3051      	cpi silencio, 1
+000263 f7f1      	brne sonando19_22_extra1	
+         	
+000264 e050      	ldi silencio, 0
+         	
+          sonando19_22_extra2:
+000265 3051      	cpi silencio, 1
+000266 f7f1      	brne sonando19_22_extra2
+         	
+000267 e050      	ldi silencio, 0
+         	
+          sonando19_22_extra3:
+000268 3051      	cpi silencio, 1
+000269 f7f1      	brne sonando19_22_extra3
+         	
+00026a e050      	ldi silencio, 0
+00026b e614      	ldi cont10ms, 100
+         	
+          sonando19_22_extra4:
+00026c 3051      	cpi silencio, 1
+00026d f7f1      	brne sonando19_22_extra4			
+         		
+         	                      ;si llego aca sono lo que debia sonar
+00026e e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+00026f ef1b      	ldi cont10ms, 251       ;valor para que no suene
+000270 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000271 bd0f      	out TCCR1A, temp
+000272 e000      	ldi temp, 0
+000273 bb08      	out portb, temp
+         	
+          silencio19:
+000274 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000275 f7f1      	brne silencio19
+         	
+000276 e400      	ldi temp, 1<<COM1A0
+000277 bd0f      	out TCCR1A, temp
+000278 e000      	ldi temp, 0
+000279 bd0b      	out OCR1AH, temp
+00027a bd0a      	out OCR1AL, temp
+00027b cdb9      	rjmp imperial_march
+         
+         ;***********************************NOTA 20************************************
+          notaGestacato:
+00027c e020      	ldi sonar, 0
+00027d e004      	ldi temp, high(1275)
+00027e bd0b      	out OCR1AH, temp
+00027f ef0b      	ldi temp, low(1275)
+000280 bd0a      	out OCR1AL, temp
+000281 9573      	inc notas
+000282 ef10      	ldi cont10ms, 240      ;tiempo que durara la nota
+000283 bb42      	out portd, sec2
+         	
+          sonando20:
+000284 3051      	cpi silencio, 1        ;aqui "ocurren" interrupciones
+000285 f7f1      	brne sonando20    ;sino son iguales sigo reproduciendo la nota
+         	                       ;si llego aca sono lo que debia sonar
+000286 e021      	ldi sonar, 1           ;le toca el silencio al silencio en si
+000287 e916      	ldi cont10ms, 150      ;tiempo que durara el silencio
+000288 e000      	ldi temp, 0<<COM1A0    ;dejamos de emitir la nota
+000289 bd0f      	out TCCR1A, temp
+00028a e000      	ldi temp, 0
+00028b bb08      	out portb, temp
+         	
+          silencio20:
+00028c 3050         cpi silencio, 0        ;aqui "ocurren" interrupciones
+00028d f7f1      	brne silencio20
+         	
+00028e e400      	ldi temp, 1<<COM1A0
+00028f bd0f      	out TCCR1A, temp
+000290 e000      	ldi temp, 0
+000291 bd0b      	out OCR1AH, temp
+000292 bd0a      	out OCR1AL, temp
+000293 cda1      	rjmp imperial_march
+         
+         ;***********************************NOTA 21************************************
+          notaGcorta:
+000294 e020         ldi sonar, 0
+000295 e004      	ldi temp, high(1275)
+000296 bd0b      	out OCR1AH, temp
+000297 ef0b      	ldi temp, low(1275)
+000298 bd0a      	out OCR1AL, temp
+000299 9573      	inc notas
+00029a e614      	ldi cont10ms, 100  ;valor para que suene
+00029b bb32      	out portd, sec1
+         	
+          sonando21:
+00029c 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00029d f7f1      	brne sonando21  ;sino son iguales sigo reproduciendo la nota
+         	                      ;si llego aca sono lo que debia sonar
+00029e e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+00029f e01a      	ldi cont10ms, 10       ;valor para que no suene
+0002a0 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0002a1 bd0f      	out TCCR1A, temp
+0002a2 e000      	ldi temp, 0
+0002a3 bb08      	out portb, temp
+         	
+          silencio21:
+0002a4 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0002a5 f7f1      	brne silencio21
+0002a6 e400      	ldi temp, 1<<COM1A0
+0002a7 bd0f      	out TCCR1A, temp
+0002a8 e000      	ldi temp, 0
+0002a9 bd0b      	out OCR1AH, temp
+0002aa bd0a      	out OCR1AL, temp
+         
+0002ab cd89      	rjmp imperial_march
+         
+         ;***********************************NOTA 23************************************
+          notaFsharp5:
+0002ac e020         ldi sonar, 0
+0002ad e001      	ldi temp, high(337)
+0002ae bd0b      	out OCR1AH, temp
+0002af e501      	ldi temp, low(337)
+0002b0 bd0a      	out OCR1AL, temp
+0002b1 9573      	inc notas
+0002b2 ef1b      	ldi cont10ms, 251   ;valor para que suene
+0002b3 bb32      	out portd, sec1
+         	
+          sonando23:
+0002b4 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0002b5 f7f1      	brne sonando23  ;sino son iguales sigo reproduciendo la nota
+         
+0002b6 e050      	ldi silencio, 0
+0002b7 ea10      	ldi cont10ms, 160
+         	
+          sonando23_extra:
+0002b8 3051      	cpi silencio, 1
+0002b9 f7f1      	brne sonando23_extra
+         	
+         	                      ;si llego aca sono lo que debia sonar
+0002ba e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0002bb ef1b      	ldi cont10ms, 251       ;valor para que no suene
+         	
+0002bc e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0002bd bd0f      	out TCCR1A, temp
+0002be e000      	ldi temp, 0
+0002bf bb08      	out portb, temp
+         	
+          silencio23:
+0002c0 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0002c1 f7f1      	brne silencio23
+         	
+0002c2 e051      	ldi silencio, 1
+         	
+          silencio23_extra:
+0002c3 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0002c4 f7f1      	brne silencio23_extra
+         	
+         	
+0002c5 e400      	ldi temp, 1<<COM1A0
+0002c6 bd0f      	out TCCR1A, temp
+0002c7 e000      	ldi temp, 0
+0002c8 bd0b      	out OCR1AH, temp
+0002c9 bd0a      	out OCR1AL, temp
+0002ca cd6a      	rjmp imperial_march
+         
+         ;***********************************NOTA 24************************************
+          notaF5:
+0002cb e020         ldi sonar, 0
+0002cc e001      	ldi temp, high(357)
+0002cd bd0b      	out OCR1AH, temp
+0002ce e605      	ldi temp, low(357)
+0002cf bd0a      	out OCR1AL, temp
+0002d0 9573      	inc notas
+0002d1 ef1b      	ldi cont10ms, 251   ;valor para que suene
+0002d2 bb42      	out portd, sec2
+         	
+          sonando24:
+0002d3 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0002d4 f7f1      	brne sonando24  ;sino son iguales sigo reproduciendo la nota
+         	
+0002d5 e050      	ldi silencio, 0
+0002d6 e11e      	ldi cont10ms, 30
+         	
+          sonando24_extra:
+0002d7 3051      	cpi silencio, 1
+0002d8 f7f1      	brne sonando24_extra
+         	
+          sonando24_extra1:
+0002d9 3051      	cpi silencio, 1
+0002da f7f1      	brne sonando24_extra1	
+         	                      ;si llego aca sono lo que debia sonar
+0002db e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0002dc e312      	ldi cont10ms, 50      ;valor para que no suene
+0002dd e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0002de bd0f      	out TCCR1A, temp
+0002df e000      	ldi temp, 0
+0002e0 bb08      	out portb, temp
+         	
+          silencio24:
+0002e1 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0002e2 f7f1      	brne silencio24
+         	
+0002e3 e400      	ldi temp, 1<<COM1A0
+0002e4 bd0f      	out TCCR1A, temp
+0002e5 e000      	ldi temp, 0
+0002e6 bd0b      	out OCR1AH, temp
+0002e7 bd0a      	out OCR1AL, temp
+0002e8 cd4c      	rjmp imperial_march
+         
+         ;***********************************NOTA 25************************************
+          notaE5:
+0002e9 e020         ldi sonar, 0
+0002ea e001      	ldi temp, high(378)
+0002eb bd0b      	out OCR1AH, temp
+0002ec e70a      	ldi temp, low(378)
+0002ed bd0a      	out OCR1AL, temp
+0002ee 9573      	inc notas
+0002ef ef1b      	ldi cont10ms, 251   ;valor para que suene
+0002f0 bb32      	out portd, sec1
+         	
+          sonando25:
+0002f1 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0002f2 f7f1      	brne sonando25  ;sino son iguales sigo reproduciendo la nota
+         	
+0002f3 e01a      	ldi cont10ms, 10
+0002f4 e050      	ldi silencio, 0
+         	
+          sonando25_extra:
+0002f5 3051      	cpi silencio, 1
+0002f6 f7f1      	brne sonando25_extra
+         	                      ;si llego aca sono lo que debia sonar
+0002f7 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0002f8 e510      	ldi cont10ms, 80      ;valor para que no suene
+0002f9 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0002fa bd0f      	out TCCR1A, temp
+0002fb e000      	ldi temp, 0
+0002fc bb08      	out portb, temp
+         	
+          silencio25:
+0002fd 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0002fe f7f1      	brne silencio25
+         	
+0002ff e400      	ldi temp, 1<<COM1A0
+000300 bd0f      	out TCCR1A, temp
+000301 e000      	ldi temp, 0
+000302 bd0b      	out OCR1AH, temp
+000303 bd0a      	out OCR1AL, temp
+000304 cd30      	rjmp imperial_march
+         
+         ;***********************************NOTA 26************************************
+          notaDsharp5:
+000305 e020         ldi sonar, 0
+000306 e001      	ldi temp, high(401)
+000307 bd0b      	out OCR1AH, temp
+000308 e901      	ldi temp, low(401)
+000309 bd0a      	out OCR1AL, temp
+00030a 9573      	inc notas
+00030b ef1b      	ldi cont10ms, 251   ;valor para que suene
+00030c bb42      	out portd, sec2
+         	
+          sonando26:
+00030d 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00030e f7f1      	brne sonando26  ;sino son iguales sigo reproduciendo la nota
+         	
+00030f e01a      	ldi cont10ms, 10
+000310 e050      	ldi silencio, 0
+         			
+          sonando26_extra:
+000311 3051      	cpi silencio, 1
+000312 f7f1      	brne sonando26_extra		
+         	                      ;si llego aca sono lo que debia sonar
+000313 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000314 e510      	ldi cont10ms, 80      ;valor para que no suene
+000315 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000316 bd0f      	out TCCR1A, temp
+000317 e000      	ldi temp, 0
+000318 bb08      	out portb, temp
+         	
+          silencio26:
+000319 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+00031a f7f1      	brne silencio26
+         	
+00031b e400      	ldi temp, 1<<COM1A0
+00031c bd0f      	out TCCR1A, temp
+00031d e000      	ldi temp, 0
+00031e bd0b      	out OCR1AH, temp
+00031f bd0a      	out OCR1AL, temp
+000320 cd14      	rjmp imperial_march
+         
+         ;***********************************NOTA 27************************************
+          notaE5silencio:
+000321 e020         ldi sonar, 0
+000322 e001      	ldi temp, high(378)
+000323 bd0b      	out OCR1AH, temp
+000324 e70a      	ldi temp, low(378)
+000325 bd0a      	out OCR1AL, temp
+000326 9573      	inc notas
+000327 ef1b      	ldi cont10ms, 251   ;valor para que suene
+000328 bb32      	out portd, sec1
+         	
+          sonando27:
+000329 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00032a f7f1      	brne sonando27  ;sino son iguales sigo reproduciendo la nota
+         	
+00032b e050      	ldi silencio, 0
+         	
+          sonando27_extra:
+00032c 3051      	cpi silencio, 1
+00032d f7f1      	brne sonando27_extra
+         	
+00032e e050      	ldi silencio, 0
+00032f e718      	ldi cont10ms, 120
+         	
+          sonando27_extra1:
+000330 3051      	cpi silencio, 1
+000331 f7f1      	brne sonando27_extra1	
+         
+         	                      ;si llego aca sono lo que debia sonar
+000332 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000333 ef1b      	ldi cont10ms, 251     ;valor para que no suene	
+000334 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000335 bd0f      	out TCCR1A, temp
+000336 e000      	ldi temp, 0
+000337 bb08      	out portb, temp
+         	
+          silencio27:
+000338 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000339 f7f1      	brne silencio27
+         	
+00033a e051      	ldi silencio, 1
+         	
+          silencio27_extra:
+00033b 3050      	cpi silencio, 0
+00033c f7f1      	brne silencio27_extra
+         	
+00033d e400      	ldi temp, 1<<COM1A0
+00033e bd0f      	out TCCR1A, temp
+00033f e000      	ldi temp, 0
+000340 bd0b      	out OCR1AH, temp
+000341 bd0a      	out OCR1AL, temp
+000342 ccf2      	rjmp imperial_march
+         
+         ;***********************************NOTA 28************************************
+          nota28Gsharp:
+000343 e020         ldi sonar, 0
+000344 e004      	ldi temp, high(1204)
+000345 bd0b      	out OCR1AH, temp
+000346 eb04      	ldi temp, low(1204)
+000347 bd0a      	out OCR1AL, temp
+000348 9573      	inc notas
+000349 ef1b      	ldi cont10ms, 251   ;valor para que suene
+00034a bb42      	out portd, sec2
+         	
+          sonando28:
+00034b 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00034c f7f1      	brne sonando28  ;sino son iguales sigo reproduciendo la nota
+         	
+00034d e050      	ldi silencio, 0
+00034e e015      	ldi cont10ms, 5
+         
+          sonando28_extra:
+00034f 3051      	cpi silencio, 1
+000350 f7f1      	brne sonando28_extra
+         	
+         	                      ;si llego aca sono lo que debia sonar
+000351 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000352 e51a      	ldi cont10ms, 90      ;valor para que no suene
+000353 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000354 bd0f      	out TCCR1A, temp
+000355 e000      	ldi temp, 0
+000356 bb08      	out portb, temp
+         	
+          silencio28:
+000357 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000358 f7f1      	brne silencio28
+         	
+000359 e400      	ldi temp, 1<<COM1A0
+00035a bd0f      	out TCCR1A, temp
+00035b e000      	ldi temp, 0
+00035c bd0b      	out OCR1AH, temp
+00035d bd0a      	out OCR1AL, temp
+00035e ccd6      	rjmp imperial_march
+         
+         ;***********************************NOTA 29************************************
+          nota29Csharp:
+00035f e020         ldi sonar, 0
+000360 e003      	ldi temp, high(918)
+000361 bd0b      	out OCR1AH, temp
+000362 e906      	ldi temp, low(918)
+000363 bd0a      	out OCR1AL, temp
+000364 9573      	inc notas
+000365 ef1b      	ldi cont10ms, 251   ;valor para que suene
+000366 bb32      	out portd, sec1
+         	
+          sonando29:
+000367 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+000368 f7f1      	brne sonando29  ;sino son iguales sigo reproduciendo la nota
+         	
+000369 e050      	ldi silencio, 0
+00036a e312         ldi cont10ms, 50
+         
+          sonando29_extra:
+00036b 3051      	cpi silencio, 1
+00036c f7f1      	brne sonando29_extra
+         	
+         	                      ;si llego aca sono lo que debia sonar
+00036d e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+00036e e614      	ldi cont10ms, 100      ;valor para que no suene
+00036f e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000370 bd0f      	out TCCR1A, temp
+000371 e000      	ldi temp, 0
+000372 bb08      	out portb, temp
+         	
+          silencio29:
+000373 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000374 f7f1      	brne silencio29
+         	
+000375 e400      	ldi temp, 1<<COM1A0
+000376 bd0f      	out TCCR1A, temp
+000377 e000      	ldi temp, 0
+000378 bd0b      	out OCR1AH, temp
+000379 bd0a      	out OCR1AL, temp
+00037a ccba      	rjmp imperial_march
+         
+         ;***********************************NOTA 30************************************
+          nota30C:
+00037b e020         ldi sonar, 0
+00037c e003      	ldi temp, high(955)
+00037d bd0b      	out OCR1AH, temp
+00037e eb0b      	ldi temp, low(955)
+00037f bd0a      	out OCR1AL, temp
+000380 9573      	inc notas
+000381 ed1c      	ldi cont10ms, 220   ;valor para que suene
+000382 bb42      	out portd, sec2
+         	
+          sonando30:
+000383 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+000384 f7f1      	brne sonando30  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+000385 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000386 e614      	ldi cont10ms, 100      ;valor para que no suene
+000387 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000388 bd0f      	out TCCR1A, temp
+000389 e000      	ldi temp, 0
+00038a bb08      	out portb, temp
+         	
+          silencio30:
+00038b 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+00038c f7f1      	brne silencio30
+         	
+00038d e400      	ldi temp, 1<<COM1A0
+00038e bd0f      	out TCCR1A, temp
+00038f e000      	ldi temp, 0
+000390 bd0b      	out OCR1AH, temp
+000391 bd0a      	out OCR1AL, temp
+000392 cca2      	rjmp imperial_march
+         	
+         ;***********************************NOTA 31************************************
+          nota31B:
+000393 e020         ldi sonar, 0
+000394 e001      	ldi temp, high(505)
+000395 bd0b      	out OCR1AH, temp
+000396 ef09      	ldi temp, low(505)
+000397 bd0a      	out OCR1AL, temp
+000398 9573      	inc notas
+000399 ec18      	ldi cont10ms, 200   ;valor para que suene
+00039a bb32      	out portd, sec1
+         	
+          sonando31:
+00039b 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00039c f7f1      	brne sonando31  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+00039d e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+00039e e718      	ldi cont10ms, 120      ;valor para que no suene
+00039f e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0003a0 bd0f      	out TCCR1A, temp
+0003a1 e000      	ldi temp, 0
+0003a2 bb08      	out portb, temp
+         	
+          silencio31:
+0003a3 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0003a4 f7f1      	brne silencio31
+         	
+0003a5 e400      	ldi temp, 1<<COM1A0
+0003a6 bd0f      	out TCCR1A, temp
+0003a7 e000      	ldi temp, 0
+0003a8 bd0b      	out OCR1AH, temp
+0003a9 bd0a      	out OCR1AL, temp
+0003aa cc8a      	rjmp imperial_march
+         
+         ;***********************************NOTA 32************************************
+          nota32Asharp:
+0003ab e020         ldi sonar, 0
+0003ac e002      	ldi temp, high(535)
+0003ad bd0b      	out OCR1AH, temp
+0003ae e107      	ldi temp, low(535)
+0003af bd0a      	out OCR1AL, temp
+0003b0 9573      	inc notas
+0003b1 ea10      	ldi cont10ms, 160   ;valor para que suene
+0003b2 bb42      	out portd, sec2
+         	
+          sonando32:
+0003b3 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0003b4 f7f1      	brne sonando32  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+0003b5 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0003b6 e510      	ldi cont10ms, 80      ;valor para que no suene
+0003b7 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0003b8 bd0f      	out TCCR1A, temp
+0003b9 e000      	ldi temp, 0
+0003ba bb08      	out portb, temp
+         	
+          silencio32:
+0003bb 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0003bc f7f1      	brne silencio32
+         	
+0003bd e400      	ldi temp, 1<<COM1A0
+0003be bd0f      	out TCCR1A, temp
+0003bf e000      	ldi temp, 0
+0003c0 bd0b      	out OCR1AH, temp
+0003c1 bd0a      	out OCR1AL, temp
+0003c2 cc72      	rjmp imperial_march	
+         	
+         ;***********************************NOTA 33************************************
+          nota33A:
+0003c3 e020         ldi sonar, 0
+0003c4 e002      	ldi temp, high(567)
+0003c5 bd0b      	out OCR1AH, temp
+0003c6 e307      	ldi temp, low(567)
+0003c7 bd0a      	out OCR1AL, temp
+0003c8 9573      	inc notas
+0003c9 ea10      	ldi cont10ms, 160   ;valor para que suene
+0003ca bb32      	out portd, sec1
+         	
+          sonando33:
+0003cb 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0003cc f7f1      	brne sonando33  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+0003cd e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0003ce e510      	ldi cont10ms, 80      ;valor para que no suene
+0003cf e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0003d0 bd0f      	out TCCR1A, temp
+0003d1 e000      	ldi temp, 0
+0003d2 bb08      	out portb, temp
+         	
+          silencio33:
+0003d3 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0003d4 f7f1      	brne silencio33
+         	
+0003d5 e400      	ldi temp, 1<<COM1A0
+0003d6 bd0f      	out TCCR1A, temp
+0003d7 e000      	ldi temp, 0
+0003d8 bd0b      	out OCR1AH, temp
+0003d9 bd0a      	out OCR1AL, temp
+0003da cc5a      	rjmp imperial_march	
+         
+         ;***********************************NOTA 34************************************
+          nota34Asharp:
+0003db e020         ldi sonar, 0
+0003dc e002      	ldi temp, high(535)
+0003dd bd0b      	out OCR1AH, temp
+0003de e107      	ldi temp, low(535)
+0003df bd0a      	out OCR1AL, temp
+0003e0 9573      	inc notas
+0003e1 ef1b      	ldi cont10ms, 251   ;valor para que suene
+0003e2 bb42      	out portd, sec2
+         	
+          sonando34:
+0003e3 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0003e4 f7f1      	brne sonando34  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+0003e5 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0003e6 ef1b      	ldi cont10ms, 251      ;valor para que no suene	
+0003e7 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0003e8 bd0f      	out TCCR1A, temp
+0003e9 e000      	ldi temp, 0
+0003ea bb08      	out portb, temp
+         	
+          silencio34:
+0003eb 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0003ec f7f1      	brne silencio34
+         	
+0003ed e051      	ldi silencio, 1
+         	
+          silencio34_extra:
+0003ee 3050      	cpi silencio, 0
+0003ef f7f1      	brne silencio34_extra
+         	
+0003f0 e051      	ldi silencio, 1
+0003f1 e614      	ldi cont10ms, 100
+         
+          silencio34_extra1:
+0003f2 3050      	cpi silencio, 0
+0003f3 f7f1      	brne silencio34_extra1
+         	
+0003f4 e400      	ldi temp, 1<<COM1A0
+0003f5 bd0f      	out TCCR1A, temp
+0003f6 e000      	ldi temp, 0
+0003f7 bd0b      	out OCR1AH, temp
+0003f8 bd0a      	out OCR1AL, temp
+0003f9 cc3b      	rjmp imperial_march	
+         	
+         ;***********************************NOTA 35************************************
+          nota35Dsharp:
+0003fa e020         ldi sonar, 0
+0003fb e006      	ldi temp, high(1607)
+0003fc bd0b      	out OCR1AH, temp
+0003fd e407      	ldi temp, low(1607)
+0003fe bd0a      	out OCR1AL, temp
+0003ff 9573      	inc notas
+000400 ec18      	ldi cont10ms, 200   ;valor para que suene
+000401 bb32      	out portd, sec1
+         	
+          sonando35:
+000402 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+000403 f7f1      	brne sonando35  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+000404 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000405 e312      	ldi cont10ms, 50      ;valor para que no suene
+000406 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000407 bd0f      	out TCCR1A, temp
+000408 e000      	ldi temp, 0
+000409 bb08      	out portb, temp
+         	
+          silencio35:
+00040a 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+00040b f7f1      	brne silencio35
+         	
+00040c e400      	ldi temp, 1<<COM1A0
+00040d bd0f      	out TCCR1A, temp
+00040e e000      	ldi temp, 0
+00040f bd0b      	out OCR1AH, temp
+000410 bd0a      	out OCR1AL, temp
+000411 cc23      	rjmp imperial_march	
+         	
+         	
+         ;***********************************NOTA 36************************************
+          nota36G:
+000412 e020         ldi sonar, 0
+000413 e004      	ldi temp, high(1275)
+000414 bd0b      	out OCR1AH, temp
+000415 ef0b      	ldi temp, low(1275)
+000416 bd0a      	out OCR1AL, temp
+000417 9573      	inc notas
+000418 ef10      	ldi cont10ms, 240   ;valor para que suene
+000419 bb42      	out portd, sec2
+         	
+          sonando36:
+00041a 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00041b f7f1      	brne sonando36  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+00041c e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+00041d e510      	ldi cont10ms, 80      ;valor para que no suene
+00041e e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+00041f bd0f      	out TCCR1A, temp
+000420 e000      	ldi temp, 0
+000421 bb08      	out portb, temp
+         	
+          silencio36:
+000422 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000423 f7f1      	brne silencio36
+         	
+000424 e400      	ldi temp, 1<<COM1A0
+000425 bd0f      	out TCCR1A, temp
+000426 e000      	ldi temp, 0
+000427 bd0b      	out OCR1AH, temp
+000428 bd0a      	out OCR1AL, temp
+000429 cc0b      	rjmp imperial_march	
+         	
+         ;***********************************NOTA 37************************************
+          nota37Dsharp:
+00042a e020         ldi sonar, 0
+00042b e006      	ldi temp, high(1607)
+00042c bd0b      	out OCR1AH, temp
+00042d e407      	ldi temp, low(1607)
+00042e bd0a      	out OCR1AL, temp
+00042f 9573      	inc notas
+000430 e812      	ldi cont10ms, 130   ;valor para que suene
+000431 bb32      	out portd, sec1
+         	
+          sonando37:
+000432 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+000433 f7f1      	brne sonando37  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+000434 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000435 e510      	ldi cont10ms, 80      ;valor para que no suene
+000436 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000437 bd0f      	out TCCR1A, temp
+000438 e000      	ldi temp, 0
+000439 bb08      	out portb, temp
+         	
+          silencio37:
+00043a 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+00043b f7f1      	brne silencio37
+         	
+00043c e400      	ldi temp, 1<<COM1A0
+00043d bd0f      	out TCCR1A, temp
+00043e e000      	ldi temp, 0
+00043f bd0b      	out OCR1AH, temp
+000440 bd0a      	out OCR1AL, temp
+000441 cbf3      	rjmp imperial_march		
+         	
+         ;***********************************NOTA 38************************************
+          nota38G:
+000442 e020         ldi sonar, 0
+000443 e004      	ldi temp, high(1275)
+000444 bd0b      	out OCR1AH, temp
+000445 ef0b      	ldi temp, low(1275)
+000446 bd0a      	out OCR1AL, temp
+000447 9573      	inc notas
+000448 ea10      	ldi cont10ms, 160   ;valor para que suene
+000449 bb42      	out portd, sec2
+         	
+          sonando38:
+00044a 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00044b f7f1      	brne sonando38  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+00044c e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+00044d e312      	ldi cont10ms, 50      ;valor para que no suene
+00044e e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+00044f bd0f      	out TCCR1A, temp
+000450 e000      	ldi temp, 0
+000451 bb08      	out portb, temp
+         	
+          silencio38:
+000452 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000453 f7f1      	brne silencio38
+         	
+000454 e400      	ldi temp, 1<<COM1A0
+000455 bd0f      	out TCCR1A, temp
+000456 e000      	ldi temp, 0
+000457 bd0b      	out OCR1AH, temp
+000458 bd0a      	out OCR1AL, temp
+000459 cbdb      	rjmp imperial_march
+         	
+         ;***********************************NOTA 39************************************
+          nota39Asharp:
+00045a e020         ldi sonar, 0
+00045b e004      	ldi temp, high(1072)
+00045c bd0b      	out OCR1AH, temp
+00045d e300      	ldi temp, low(1072)
+00045e bd0a      	out OCR1AL, temp
+00045f 9573      	inc notas
+000460 ec18      	ldi cont10ms, 200   ;valor para que suene
+000461 bb32      	out portd, sec1
+         	
+          sonando39:
+000462 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+000463 f7f1      	brne sonando39  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+000464 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000465 e510      	ldi cont10ms, 80      ;valor para que no suene
+000466 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000467 bd0f      	out TCCR1A, temp
+000468 e000      	ldi temp, 0
+000469 bb08      	out portb, temp
+         	
+          silencio39:
+00046a 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+00046b f7f1      	brne silencio39
+         	
+00046c e400      	ldi temp, 1<<COM1A0
+00046d bd0f      	out TCCR1A, temp
+00046e e000      	ldi temp, 0
+00046f bd0b      	out OCR1AH, temp
+000470 bd0a      	out OCR1AL, temp
+000471 cbc3      	rjmp imperial_march	
+         	
+         ;***********************************NOTA 40************************************
+          nota40G:
+000472 e020         ldi sonar, 0
+000473 e004      	ldi temp, high(1275)
+000474 bd0b      	out OCR1AH, temp
+000475 ef0b      	ldi temp, low(1275)
+000476 bd0a      	out OCR1AL, temp
+000477 9573      	inc notas
+000478 ec18      	ldi cont10ms, 200   ;valor para que suene
+000479 bb42      	out portd, sec2
+         	
+          sonando40:
+00047a 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+00047b f7f1      	brne sonando40  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+00047c e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+00047d e614      	ldi cont10ms, 100      ;valor para que no suene
+00047e e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+00047f bd0f      	out TCCR1A, temp
+000480 e000      	ldi temp, 0
+000481 bb08      	out portb, temp
+         	
+          silencio40:
+000482 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000483 f7f1      	brne silencio40
+         	
+000484 e400      	ldi temp, 1<<COM1A0
+000485 bd0f      	out TCCR1A, temp
+000486 e000      	ldi temp, 0
+000487 bd0b      	out OCR1AH, temp
+000488 bd0a      	out OCR1AL, temp
+000489 cbab      	rjmp imperial_march	
+         	
+         ;***********************************NOTA 41************************************
+          nota41Asharp:
+00048a e020         ldi sonar, 0
+00048b e004      	ldi temp, high(1072)
+00048c bd0b      	out OCR1AH, temp
+00048d e300      	ldi temp, low(1072)
+00048e bd0a      	out OCR1AL, temp
+00048f 9573      	inc notas
+000490 ea10      	ldi cont10ms, 160   ;valor para que suene
+000491 bb32      	out portd, sec1
+         	
+          sonando41:
+000492 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+000493 f7f1      	brne sonando41  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+000494 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+000495 e416      	ldi cont10ms, 70      ;valor para que no suene
+000496 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+000497 bd0f      	out TCCR1A, temp
+000498 e000      	ldi temp, 0
+000499 bb08      	out portb, temp
+         	
+          silencio41:
+00049a 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+00049b f7f1      	brne silencio41
+         	
+00049c e400      	ldi temp, 1<<COM1A0
+00049d bd0f      	out TCCR1A, temp
+00049e e000      	ldi temp, 0
+00049f bd0b      	out OCR1AH, temp
+0004a0 bd0a      	out OCR1AL, temp
+0004a1 cb93      	rjmp imperial_march
+         	
+         ;***********************************NOTA 42************************************
+          nota42D:
+0004a2 e020      	ldi sonar, 0
+0004a3 e003      	ldi temp, high(851)
+0004a4 bd0b      	out OCR1AH, temp
+0004a5 e503      	ldi temp, low(851)
+0004a6 bd0a      	out OCR1AL, temp
+0004a7 ef1b      	ldi cont10ms, 251     ;el valor calculado enverdad es 384
+0004a8 9573      	inc notas
+0004a9 bb42      	out portd, sec2
+         	
+          sonando42:
+0004aa 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0004ab f7f1      	brne sonando42  ;sino son iguales sigo reproduciendo la nota
+         	
+0004ac e050      	ldi silencio, 0
+0004ad ea10      	ldi cont10ms, 160     ;por esto se usan 2 veces, no cabe en 8 bits
+         	
+          sonando42_extra:
+0004ae 3051      	cpi silencio, 1
+0004af f7f1      	brne sonando42_extra
+         	                      ;si llego aca sono lo que debia sonar
+0004b0 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0004b1 ef1b      	ldi cont10ms, 251     ;el verdadero valor es 336
+0004b2 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0004b3 bd0f      	out TCCR1A, temp
+0004b4 e000      	ldi temp, 0
+0004b5 bb08      	out portb, temp
+         	
+          silencio42:
+0004b6 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0004b7 f7f1      	brne silencio42
+0004b8 e051      	ldi silencio, 1
+0004b9 e515      	ldi cont10ms, 85
+         	
+          silencio42_extra:
+0004ba 3050      	cpi silencio, 0
+0004bb f7f1      	brne silencio42_extra
+         		
+0004bc e400      	ldi temp, 1<<COM1A0
+0004bd bd0f      	out TCCR1A, temp
+0004be e000      	ldi temp, 0
+0004bf bd0b      	out OCR1AH, temp
+0004c0 bd0a      	out OCR1AL, temp
+0004c1 cb73      	rjmp imperial_march
+         
+         ;***********************************NOTA 64************************************
+          nota64Dsharp:
+0004c2 e020         ldi sonar, 0
+0004c3 e006      	ldi temp, high(1607)
+0004c4 bd0b      	out OCR1AH, temp
+0004c5 e407      	ldi temp, low(1607)
+0004c6 bd0a      	out OCR1AL, temp
+0004c7 9573      	inc notas
+0004c8 e916      	ldi cont10ms, 150   ;valor para que suene
+0004c9 bb42      	out portd, sec2
+         	
+          sonando64:
+0004ca 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0004cb f7f1      	brne sonando64  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+0004cc e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0004cd e614      	ldi cont10ms, 100     ;valor para que no suene
+0004ce e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0004cf bd0f      	out TCCR1A, temp
+0004d0 e000      	ldi temp, 0
+0004d1 bb08      	out portb, temp
+         	
+          silencio64:
+0004d2 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0004d3 f7f1      	brne silencio64
+         	
+0004d4 e400      	ldi temp, 1<<COM1A0
+0004d5 bd0f      	out TCCR1A, temp
+0004d6 e000      	ldi temp, 0
+0004d7 bd0b      	out OCR1AH, temp
+0004d8 bd0a      	out OCR1AL, temp
+0004d9 cb5b      	rjmp imperial_march	
+         	
+         ;***********************************NOTA 65************************************
+          nota65Asharp:
+0004da e020         ldi sonar, 0
+0004db e004      	ldi temp, high(1072)
+0004dc bd0b      	out OCR1AH, temp
+0004dd e300      	ldi temp, low(1072)
+0004de bd0a      	out OCR1AL, temp
+0004df 9573      	inc notas
+0004e0 ea10      	ldi cont10ms, 160   ;valor para que suene
+0004e1 bb32      	out portd, sec1
+         	
+          sonando65:
+0004e2 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0004e3 f7f1      	brne sonando65        ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+0004e4 e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0004e5 e614      	ldi cont10ms, 100      ;valor para que no suene
+0004e6 e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0004e7 bd0f      	out TCCR1A, temp
+0004e8 e000      	ldi temp, 0
+0004e9 bb08      	out portb, temp
+         	
+          silencio65:
+0004ea 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+0004eb f7f1      	brne silencio65
+         	
+0004ec e400      	ldi temp, 1<<COM1A0
+0004ed bd0f      	out TCCR1A, temp
+0004ee e000      	ldi temp, 0
+0004ef bd0b      	out OCR1AH, temp
+0004f0 bd0a      	out OCR1AL, temp
+0004f1 cb43      	rjmp imperial_march
+         
+         ;***********************************NOTA 66************************************
+          nota66G:
+0004f2 e020         ldi sonar, 0
+0004f3 e004      	ldi temp, high(1275)
+0004f4 bd0b      	out OCR1AH, temp
+0004f5 ef0b      	ldi temp, low(1275)
+0004f6 bd0a      	out OCR1AL, temp
+0004f7 9573      	inc notas
+0004f8 ef10      	ldi cont10ms, 240   ;valor para que suene
+0004f9 bb42      	out portd, sec2
+         	
+          sonando66:
+0004fa 3051      	cpi silencio, 1       ;aqui "ocurren" interrupciones
+0004fb f7f1      	brne sonando66  ;sino son iguales sigo reproduciendo la nota
+         	
+         	                      ;si llego aca sono lo que debia sonar
+0004fc e021      	ldi sonar, 1          ;le toca el silencio al silencio en si
+0004fd e614      	ldi cont10ms, 100      ;valor para que no suene
+0004fe e000      	ldi temp, 0<<COM1A0 ;dejamos de emitir la nota
+0004ff bd0f      	out TCCR1A, temp
+000500 e000      	ldi temp, 0
+000501 bb08      	out portb, temp
+         	
+          silencio66:
+000502 3050         cpi silencio, 0       ;aqui "ocurren" interrupciones
+000503 f7f1      	brne silencio66
+         	
+000504 e400      	ldi temp, 1<<COM1A0
+000505 bd0f      	out TCCR1A, temp
+000506 e000      	ldi temp, 0
+000507 bd0b      	out OCR1AH, temp
+000508 bd0a      	out OCR1AL, temp
+000509 cb2b      	rjmp imperial_march			
+         
+
+Assembly complete with no errors.

@@ -1,0 +1,17 @@
+Creating   'imperial_march_song_full.eep'
+Creating   'imperial_march_song_full.hex'
+Creating   'imperial_march_song_full.obj'
+Creating   'imperial_march_song_full.lis'
+Creating   'imperial_march_song_full.map'
+
+Assembling 'imperial_march_song_full.asm'
+Including  'C:\VMLAB\include\m8def.inc'
+
+Program memory usage:
+Code             : 1285 words
+Constants (dw/db):    0 words
+Unused           :    5 words
+Total            : 1290 words
+
+Assembly complete with no errors.
+Deleting   'imperial_march_song_full.eep'
